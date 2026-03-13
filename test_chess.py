@@ -173,7 +173,10 @@ def infer_move(board, changed_squares):
 
 # --- MAIN ---
 def main():
-    cap = cv2.VideoCapture(0)
+    # Đổi 0 thành tên video file (ví dụ: "chess_move.mp4") nếu muốn test bằng video có sẵn
+    VIDEO_PATH = "chess_move.mp4" 
+    # cap = cv2.VideoCapture(0) # Dùng cho Camera
+    cap = cv2.VideoCapture(VIDEO_PATH) # Dùng cho Video File
 
     # Set up logic variables
 
