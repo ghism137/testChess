@@ -7,8 +7,10 @@
 
 Hệ thống cung cấp 2 chế độ nhận diện và hoạt động qua hai file chính:
 
-1. **`test_chess.py` (Chế độ tự động):** Tự động phát hiện góc của bàn cờ sử dụng thuật toán Contour Analysis (tìm viền ngoài lớn nhất).
-2. **`test_chess_manualConner.py` (Chế độ thủ công):** Cho phép người dùng chọn thủ công 4 góc của bàn cờ để warp ảnh, giúp tăng độ ổn định và chính xác trong các điều kiện ánh sáng hoặc góc máy khó.
+1. **`test_chess.py` (Bản hợp nhất đầy đủ nhất):** Chế độ thông minh chạy mặc định, tự động phát hiện góc và viền của bàn cờ sử dụng thuật toán Contour Analysis và xấp xỉ hình học. Tích hợp khả năng điều chỉnh lưới bằng HoughLines, phân tách nước đi, có ghi file PGN chuẩn, có phím tắt `m` để chuyển sang chọn góc thủ công nếu Auto thất bại.
+2. **`test_chess2.py`:** Thiết kế tập trung vào mã nguồn OOP thông qua Class `ChessMoveDetector`, đi kèm chế độ Preview Grid (nhấn 'g') để dễ căn chỉnh tay.
+3. **`test_chess3.py`:** Bản rút ngọn chỉ chuyên tự động chọn góc (Auto Mode), dành riêng cho mục đích thiết lập góc máy bay từ trên xuống.
+4. **`test_chess_manualConner.py` (Chế độ truyền thống - Manual Corner):** Sử dụng các click chuột người dùng để chọn cố định 4 tọa độ (A8-H8-H1-A1) làm cơ sở warp bàn cờ. Ổn định và nhẹ nhàng.
 
 ## 🧠 Kiến trúc hệ thống & Luồng xử lý (Pipeline)
 

@@ -4,8 +4,14 @@ Hệ thống nhận diện nước đi cờ vua từ camera bằng xử lý ản
 
 Project gồm 2 chế độ hoạt động:
 
-- `test_chess.py` → Tự động phát hiện bàn cờ bằng Contour Analysis (findContours)
-- `test_chess_manualConner.py` → Hiệu chỉnh thủ công 4 góc (ổn định hơn)
+- `test_chess.py` → Bản tổng hợp cấu hình đầy đủ. Tự động phát hiện viền bàn cờ, có thể ấn `m` để sang thủ công.
+- `test_chess2.py` → Bản viết lại với Class OOP `ChessMoveDetector`, nổi bật với bật lưới Preview (phím `g`).
+- `test_chess3.py` → Bản chạy tự động thu gọn.
+- `test_chess_manualConner.py` → Cố định nhập 4 góc thủ công cho các luồng máy quay không ổn định.
+
+---
+
+> 📌 **Chi tiết Thuật toán & Logic Code:** Xem file [`logic.md`](./logic.md) để hiểu cặn kẽ giải pháp nhận diện thị giác và xử lý cờ vua của dự án.
 
 ---
 
