@@ -111,9 +111,13 @@ def detect_changes(prev_img, curr_img, h_grid, v_grid):
     prev_gray = cv2.cvtColor(prev_img, cv2.COLOR_BGR2GRAY)
     curr_gray = cv2.cvtColor(curr_img, cv2.COLOR_BGR2GRAY)
 
+    # Làm mờ để giảm nhiễu do rung lắc camera (jitter/noise)
+    prev_blur = cv2.GaussianBlur(prev_gray, (5, 5), 0)
+    curr_blur = cv2.GaussianBlur(curr_gray, (5, 5), 0)
+
     # Tính hiệu ảnh
-    diff = cv2.absdiff(prev_gray, curr_gray)
-    _, thresh = cv2.threshold(diff, 35, 255, cv2.THRESH_BINARY) 
+    diff = cv2.absdiff(prev_blur, curr_blur)
+    _, thresh = cv2.threshold(diff, 40, 255, cv2.THRESH_BINARY) 
 
     changes = []
     
@@ -170,17 +174,19 @@ def infer_move(board, changed_squares):
 
     return None, "No matching legal move found"
 
-def draw_grid(img, grid_size = 500, cells = 8):
-    step = grid_size // cells
+def draw_grid(img, h_grid=None, v_grid=None, grid_size = 500, cells = 8):
+    if h_grid is None or v_grid is None or len(h_grid) == 0 or len(v_grid) == 0:
+        step = grid_size // cells
+        h_grid = np.linspace(0, grid_size, cells + 1)
+        v_grid = np.linspace(0, grid_size, cells + 1)
 
-    # Doc
-    for i in range(cells + 1):
-        x = i*step
-        cv2.line(img, (x, 0), (x, grid_size), (255, 0, 0), 1)
+    # Dọc (v_grid)
+    for x in v_grid:
+        cv2.line(img, (int(x), 0), (int(x), grid_size), (255, 0, 0), 1)
 
-    for i in range(cells + 1):
-        y = i*step
-        cv2.line(img, (0, y), (grid_size, y), (0, 255, 0), 1)
+    # Ngang (h_grid)
+    for y in h_grid:
+        cv2.line(img, (0, int(y)), (grid_size, int(y)), (0, 255, 0), 1)
     return img
 
 calibration_points = []
@@ -308,7 +314,7 @@ def main():
             inner = cv2.resize(inner, (WARPED_SIZE, WARPED_SIZE))
 
             # thể hiện ra grid view
-            grid_view = draw_grid(inner.copy())
+            grid_view = draw_grid(inner.copy(), h_grid, v_grid, WARPED_SIZE)
             cv2.imshow("Warped View", grid_view)
 
             current_warped_img = inner
@@ -342,16 +348,22 @@ def main():
                 if lines_w is not None:
                     for l in lines_w:
                         rho, theta = l[0]
-                        if np.pi/4 < theta < 3*np.pi/4: h_lines.append(rho)
-                        else: v_lines.append(rho)
+                        # Chú ý: rho có thể âm nếu theta > pi/2
+                        if np.pi/4 < theta < 3*np.pi/4: h_lines.append(abs(rho))
+                        else: v_lines.append(abs(rho))
 
                 def cluster_lines(data, max_val):
-                    data.sort()
                     if not data: return np.linspace(0, max_val, 9).tolist()
-                    res = [data[0]]
+                    data.sort()
+                    res = []
+                    current_cluster = [data[0]]
                     for i in range(1, len(data)):
                         if abs(data[i] - data[i-1]) > 40: # Khoảng cách tối thiểu giữa 2 đường kẻ phải > 40px
-                            res.append(data[i])
+                            res.append(sum(current_cluster)/len(current_cluster))
+                            current_cluster = [data[i]]
+                        else:
+                            current_cluster.append(data[i])
+                    res.append(sum(current_cluster)/len(current_cluster))
                     
                     # Nếu thuật toán Calibrate không tìm đủ 8 ô (9 đường viền), fall back về chia đều tránh lỗi.
                     if len(res) != 9:
